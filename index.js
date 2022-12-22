@@ -30,6 +30,7 @@ function calculateDistance(nestX, nestY, droneX, droneY) {
 }
 
 function getData() {
+  const now = new Date();
   //This promise will resolve when the network call succeeds
   const networkPromise = fetch(allDronesURL)
     .then((response) => response.text())
@@ -42,7 +43,6 @@ function getData() {
       allDronesList = data;
       // saving snapshotTimestamp value to add later to the drone object
       const timeStamp = data.report.capture._attributes.snapshotTimestamp;
-      console.log(timeStamp);
       return data.report.capture.drone.filter((drone) => {
         if (
           isInsideNFZ(
@@ -55,15 +55,12 @@ function getData() {
         ) {
           drone.snapshotTimestamp = timeStamp;
           return drone;
-        } else {
-          console.log("Outside NFZ");
         }
       });
     })
     // Assigning data to dronesInNFZList returning data for PilotsInfoList
     .then((data) => {
       dronesInNFZList = data;
-      //console.log("drons in no-flight-zone: ", dronesInNFZList);
       // All promises must be resolved before moving on
       return Promise.all(
         data.map((drone) => {
@@ -74,7 +71,6 @@ function getData() {
               parseFloat(drone.positionX._text),
               parseFloat(drone.positionY._text)
             );
-            //console.log(distance, "distance");
 
             // saving snapshotTimestamp value to add later to the pilot object
             const timeStamp = drone.snapshotTimestamp;
@@ -92,34 +88,48 @@ function getData() {
     })
     // Assigning data to PilotsInfoList
     .then((data) => {
-      //console.log(PilotsInfoList);
-      console.log(data.length);
-
       if (!PilotsInfoList && data.length > 0) {
         PilotsInfoList = data;
-      } else {
+      } else if (data.length > 0) {
         data.map((pilot) => {
           // Pilot found in existing list
           const foundPilot = PilotsInfoList.find(
             ({ pilotId }) => pilotId === pilot.pilotId
           );
           if (foundPilot) {
-            console.log("FOUND", pilot.pilotId);
-
-            // Update Closest distance to the nest if needed
-            foundPilot.closestDistance > pilot.closestDistance
-              ? (foundPilot.closestDistance = pilot.closestDistance)
-              : console.log("no need to update closest distance");
-
-            //update timeStamp when last seen
+            // Update closest distance to the nest if needed
+            if (foundPilot.closestDistance > pilot.closestDistance) {
+              foundPilot.closestDistance = pilot.closestDistance;
+            }
+            // Update timeStamp when last seen
             foundPilot.snapshotTimestamp = pilot.snapshotTimestamp;
           } else {
             PilotsInfoList.push(pilot);
           }
         });
       }
-      // TODO: filter 10 minutes since their drone was last seen by the equipment
-      //PilotsInfoList.filter
+      // Filter out pilots seen more than 10 minutes ago
+      const updatedPilotsLIST = PilotsInfoList
+        ? PilotsInfoList.filter((pilot) => {
+            if (
+              Date.parse(now) / 1000 / 60 -
+                Date.parse(pilot.snapshotTimestamp) / 1000 / 60 <
+              10
+            ) {
+              return pilot;
+            }
+          })
+        : null;
+      // Only update pilots list if some pilots were filtered out
+      if (
+        updatedPilotsLIST &&
+        updatedPilotsLIST.length < PilotsInfoList.length
+      ) {
+        PilotsInfoList = updatedPilotsLIST;
+      }
+    })
+    .catch((error) => {
+      console.log(error);
     });
 
   //This promise will resolve when 2 seconds have passed
