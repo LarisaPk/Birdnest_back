@@ -6,18 +6,18 @@ var allDronesURL = "https://assignments.reaktor.com/birdnest/drones";
 var pilotInfoURL = "https://assignments.reaktor.com/birdnest/pilots/"; //add :serialNumber to the request parameter
 
 let allDronesList;
-let dronesInNFZList;
-let PilotsInfoList;
+let dronesInNDZList;
+let pilotsInfoList;
 
 const nestPositionX = 250000;
 const nestPositionY = 250000;
-const NZFRadius = 100 * 1000; // radius in units
+const NDZRadius = 100 * 1000; // radius in units
 
 // The general equation of a circle with radius r and origin (𝑥0,𝑦0) is (𝑥−𝑥0 ) ** 2 + (𝑦−𝑦0) ** 2 = r ** 2
 // The point (x, y) lies outside, on or inside the circle
 // accordingly as the expression (𝑥−𝑥0) ** 2 + (𝑦−𝑦0) ** 2 - r ** 2 is positive, zero or negative.
-function isInsideNFZ(nestX, nestY, NZFRadius, droneX, droneY) {
-  if ((droneX - nestX) ** 2 + (droneY - nestY) ** 2 <= NZFRadius ** 2)
+function isInsideNDZ(nestX, nestY, NDZRadius, droneX, droneY) {
+  if ((droneX - nestX) ** 2 + (droneY - nestY) ** 2 <= NDZRadius ** 2)
     return true;
   else return false;
 }
@@ -30,89 +30,116 @@ function calculateDistance(nestX, nestY, droneX, droneY) {
 }
 
 function getData() {
-  const now = new Date();
+  let timeStamp;
   //This promise will resolve when the network call succeeds
   const networkPromise = fetch(allDronesURL)
     .then((response) => response.text())
-    // Converting XML to JSON
+    // Converting XML to JSON and then to object
     .then((data) =>
       JSON.parse(convert.xml2json(data, { compact: true, spaces: 2 }))
     )
-    // Assigning data to allDronesList, returning data for dronesInNFZList
+    // Assigning data to allDronesList, returning data for dronesInNDZList
     .then((data) => {
       allDronesList = data;
-      // saving snapshotTimestamp value to add later to the drone object
-      const timeStamp = data.report.capture._attributes.snapshotTimestamp;
+      // saving snapshotTimestamp value to add later to the pilot object in pilotsInfoList
+      timeStamp = data.report.capture._attributes.snapshotTimestamp;
       return data.report.capture.drone.filter((drone) => {
         if (
-          isInsideNFZ(
+          isInsideNDZ(
             nestPositionX,
             nestPositionY,
-            NZFRadius,
+            NDZRadius,
             parseFloat(drone.positionX._text),
             parseFloat(drone.positionY._text)
           )
         ) {
-          drone.snapshotTimestamp = timeStamp;
           return drone;
         }
       });
     })
-    // Assigning data to dronesInNFZList returning data for PilotsInfoList
+    // Assigning data to dronesInNDZList returning data for pilotsInfoList
     .then((data) => {
-      dronesInNFZList = data;
+      dronesInNDZList = data;
       // All promises must be resolved before moving on
       return Promise.all(
         data.map((drone) => {
-          return fetch(pilotInfoURL + drone.serialNumber._text).then((data) => {
-            const distance = calculateDistance(
-              nestPositionX,
-              nestPositionY,
-              parseFloat(drone.positionX._text),
-              parseFloat(drone.positionY._text)
+          // calculate distance to the nest
+          const distance = calculateDistance(
+            nestPositionX,
+            nestPositionY,
+            parseFloat(drone.positionX._text),
+            parseFloat(drone.positionY._text)
+          );
+          // Try to find pilot in existing list if list exists
+          const foundPilot = pilotsInfoList
+            ? pilotsInfoList.find(
+                ({ droneSerialNumber }) =>
+                  droneSerialNumber === drone.serialNumber._text
+              )
+            : null;
+
+          // If this pilot already exists in the pilotsInfoList update data and return it
+          if (foundPilot) {
+            foundPilot.closestDistance =
+              foundPilot.closestDistance > distance
+                ? distance
+                : foundPilot.closestDistance;
+            foundPilot.snapshotTimestamp = timeStamp;
+            return foundPilot;
+
+            // If it is a new pilot, fetch and return data (not fetching data for pilots that are already on the list)
+          } else {
+            return fetch(pilotInfoURL + drone.serialNumber._text).then(
+              (data) => {
+                const pilot = Promise.resolve(data.json());
+                // Adding closestDistance, snapshotTimestamp, droneSerialNumber to the pilot object
+                pilot.then((data) => {
+                  data.closestDistance = distance;
+                  data.snapshotTimestamp = timeStamp;
+                  data.droneSerialNumber = drone.serialNumber._text;
+                });
+                return pilot;
+              }
             );
-
-            // saving snapshotTimestamp value to add later to the pilot object
-            const timeStamp = drone.snapshotTimestamp;
-
-            const pilot = Promise.resolve(data.json());
-            // Adding distance to the nest to closestDistance property, adding snapshotTimestamp
-            pilot.then((data) => {
-              data.closestDistance = distance;
-              data.snapshotTimestamp = timeStamp;
-            });
-            return pilot;
-          });
+          }
         })
       );
     })
-    // Assigning data to PilotsInfoList
+    // Assigning or updatinng data to pilotsInfoList
     .then((data) => {
-      if (!PilotsInfoList && data.length > 0) {
-        PilotsInfoList = data;
+      // if pilotsInfoList is empty assign data
+      if (!pilotsInfoList && data.length > 0) {
+        pilotsInfoList = data;
       } else if (data.length > 0) {
-        data.map((pilot) => {
+        data.forEach((pilot) => {
           // Pilot found in existing list
-          const foundPilot = PilotsInfoList.find(
+          const foundPilot = pilotsInfoList.find(
             ({ pilotId }) => pilotId === pilot.pilotId
           );
           if (foundPilot) {
-            // Update closest distance to the nest if needed
-            if (foundPilot.closestDistance > pilot.closestDistance) {
-              foundPilot.closestDistance = pilot.closestDistance;
-            }
+            // Find pilot index
+            const foundPilotIndex = pilotsInfoList.findIndex(
+              ({ pilotId }) => pilotId === pilot.pilotId
+            );
+            // Update closest distance to the nest
+            pilotsInfoList[foundPilotIndex].closestDistance =
+              pilot.closestDistance;
+
             // Update timeStamp when last seen
-            foundPilot.snapshotTimestamp = pilot.snapshotTimestamp;
+            pilotsInfoList[foundPilotIndex].snapshotTimestamp =
+              pilot.snapshotTimestamp;
           } else {
-            PilotsInfoList.push(pilot);
+            pilotsInfoList.push(pilot);
           }
         });
       }
-      // Filter out pilots seen more than 10 minutes ago
-      const updatedPilotsLIST = PilotsInfoList
-        ? PilotsInfoList.filter((pilot) => {
+    })
+    // Filter out pilots seen more than 10 minutes ago in NDZ
+    .then(() => {
+      const updatedPilotsLIST = pilotsInfoList
+        ? pilotsInfoList.filter((pilot) => {
             if (
-              Date.parse(now) / 1000 / 60 -
+              Date.parse(timeStamp) / 1000 / 60 -
                 Date.parse(pilot.snapshotTimestamp) / 1000 / 60 <
               10
             ) {
@@ -123,9 +150,9 @@ function getData() {
       // Only update pilots list if some pilots were filtered out
       if (
         updatedPilotsLIST &&
-        updatedPilotsLIST.length < PilotsInfoList.length
+        updatedPilotsLIST.length < pilotsInfoList.length
       ) {
-        PilotsInfoList = updatedPilotsLIST;
+        pilotsInfoList = updatedPilotsLIST;
       }
     })
     .catch((error) => {
@@ -152,15 +179,15 @@ app.get("/api/all_drones_now", (request, response) => {
     : response.json("data is not ready");
 });
 
-app.get("/api/drones_in_nfz", (request, response) => {
-  dronesInNFZList
-    ? response.json(dronesInNFZList)
+app.get("/api/drones_in_ndz", (request, response) => {
+  dronesInNDZList
+    ? response.json(dronesInNDZList)
     : response.json("data is not ready");
 });
 
 app.get("/api/pilots_info", (request, response) => {
-  PilotsInfoList
-    ? response.json(PilotsInfoList)
+  pilotsInfoList
+    ? response.json(pilotsInfoList)
     : response.json("data is not ready");
 });
 
