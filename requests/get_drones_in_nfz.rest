@@ -1,1 +1,1 @@
-GET http://localhost:3001/api/drones_in_ndz
+GET http://localhost:3001/api/drones/ndz
