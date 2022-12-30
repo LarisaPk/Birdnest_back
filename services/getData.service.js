@@ -1,7 +1,7 @@
-const data = require("../");
 // Contains the majority of logic. Calls external API, processes the data and stores it in variables.
 // Exports getData function and variables allDronesList, dronesInNDZList, pilotsInfoList
 const convert = require("xml-js");
+
 var allDronesURL = "https://assignments.reaktor.com/birdnest/drones";
 var pilotInfoURL = "https://assignments.reaktor.com/birdnest/pilots/"; //add :serialNumber to the request parameter
 
@@ -165,7 +165,7 @@ function getData() {
     setTimeout(resolve, 2000, "Timeout Done");
   });
 
-  Promise.all([networkPromise, timeOutPromise]).then(function (values) {
+  Promise.all([networkPromise, timeOutPromise]).then(() => {
     console.log("Atleast 2 secs + TTL (Network/server)");
     //Repeat
     getData();
