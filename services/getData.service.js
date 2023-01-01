@@ -78,22 +78,27 @@ function getData() {
               )
             : null;
 
-          // If this pilot already exists in the pilotsInfoList update data and return it
+          // If this pilot already exists in the pilotsInfoList copy, update data and return copy
           if (foundPilot) {
-            foundPilot.closestDistance =
-              foundPilot.closestDistance > distance
+            // shallow copy is ok in this case. no nesting
+            const updatedPilot = {
+              ...foundPilot,
+            };
+
+            updatedPilot.closestDistance =
+              updatedPilot.closestDistance > distance
                 ? distance
-                : foundPilot.closestDistance;
-            foundPilot.snapshotTimestamp = timeStamp;
-            return foundPilot;
+                : updatedPilot.closestDistance;
+            updatedPilot.snapshotTimestamp = timeStamp;
+            return updatedPilot;
 
             // If it is a new pilot, fetch and return data (not fetching data for pilots that are already on the list)
           } else {
             return fetch(pilotInfoURL + drone.serialNumber._text).then(
               (data) => {
                 const pilot = Promise.resolve(data.json());
-                // Adding closestDistance, snapshotTimestamp, droneSerialNumber to the pilot object
                 pilot.then((data) => {
+                  // Adding closestDistance, snapshotTimestamp, droneSerialNumber to the pilot object
                   data.closestDistance = distance;
                   data.snapshotTimestamp = timeStamp;
                   data.droneSerialNumber = drone.serialNumber._text;
@@ -107,8 +112,8 @@ function getData() {
     })
     // Assigning or updatinng data to pilotsInfoList
     .then((data) => {
-      // if pilotsInfoList is empty assign data
-      if (!pilotsInfoList && data.length > 0) {
+      // if pilotsInfoList is undefined assign data
+      if (pilotsInfoList === undefined && data.length > 0) {
         pilotsInfoList = data;
       } else if (data.length > 0) {
         data.forEach((pilot) => {
@@ -124,7 +129,6 @@ function getData() {
             // Update closest distance to the nest
             pilotsInfoList[foundPilotIndex].closestDistance =
               pilot.closestDistance;
-
             // Update timeStamp when last seen
             pilotsInfoList[foundPilotIndex].snapshotTimestamp =
               pilot.snapshotTimestamp;
@@ -152,7 +156,8 @@ function getData() {
         updatedPilotsLIST &&
         updatedPilotsLIST.length < pilotsInfoList.length
       ) {
-        pilotsInfoList = updatedPilotsLIST;
+        //replacing content of array: splice(start, deleteCount, item1)
+        pilotsInfoList.splice(0, pilotsInfoList.length, ...updatedPilotsLIST);
       }
     })
     .catch((error) => {
