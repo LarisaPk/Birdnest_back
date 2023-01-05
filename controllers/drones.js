@@ -3,7 +3,7 @@ const getDataService = require("../services/getData.service");
 
 dronesRouter.get("/now", (request, response) => {
   const allDronesList = getDataService.getAllDronesList();
-  allDronesList.report
+  allDronesList
     ? response.json(allDronesList)
     : response.status(404).send({ error: "data is not ready yet" });
 });

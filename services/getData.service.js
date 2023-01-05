@@ -40,7 +40,20 @@ function getData() {
     )
     // Assigning data to allDronesList, returning data for dronesInNDZList
     .then((data) => {
-      allDronesList = data;
+      // if allDronesList is undefined assignt datat to it
+      if (!allDronesList && data && data.report.capture.drone.length > 0) {
+        allDronesList = data.report.capture.drone;
+      } else if (
+        allDronesList &&
+        data &&
+        data.report.capture.drone.length > 0
+      ) {
+        allDronesList.splice(
+          0,
+          allDronesList.length,
+          ...data.report.capture.drone
+        );
+      }
       // saving snapshotTimestamp value to add later to the pilot object in pilotsInfoList
       timeStamp = data.report.capture._attributes.snapshotTimestamp;
       return data.report.capture.drone.filter((drone) => {
@@ -57,9 +70,14 @@ function getData() {
         }
       });
     })
-    // Assigning data to dronesInNDZList returning data for pilotsInfoList
+    // Assigning data to dronesInNDZList returning new data for pilotsInfoList
     .then((data) => {
-      dronesInNDZList = data;
+      // if dronesInNDZList is undefined assign data
+      if (!dronesInNDZList && data && data.length > 0) {
+        dronesInNDZList = data;
+      } else if (dronesInNDZList && data && data.length > 0) {
+        dronesInNDZList.splice(0, dronesInNDZList.length, ...data);
+      }
       // All promises must be resolved before moving on
       return Promise.all(
         data.map((drone) => {
@@ -80,29 +98,36 @@ function getData() {
 
           // If this pilot already exists in the pilotsInfoList copy, update data and return copy
           if (foundPilot) {
-            // shallow copy is ok in this case. no nesting
-            const updatedPilot = {
-              ...foundPilot,
-            };
+            const lastseenMinAgo =
+              Date.parse(timeStamp) / 1000 / 60 -
+              Date.parse(foundPilot.snapshotTimestamp) / 1000 / 60;
 
-            updatedPilot.closestDistance =
-              updatedPilot.closestDistance > distance
-                ? distance
-                : updatedPilot.closestDistance;
-            updatedPilot.snapshotTimestamp = timeStamp;
-            return updatedPilot;
+            return {
+              ...foundPilot,
+              closestDistance:
+                foundPilot.closestDistance > distance
+                  ? distance
+                  : foundPilot.closestDistance,
+              snapshotTimestamp: timeStamp,
+              lastSeenMinAgo: lastseenMinAgo,
+            };
 
             // If it is a new pilot, fetch and return data (not fetching data for pilots that are already on the list)
           } else {
             return fetch(pilotInfoURL + drone.serialNumber._text).then(
               (data) => {
                 const pilot = Promise.resolve(data.json());
-                pilot.then((data) => {
-                  // Adding closestDistance, snapshotTimestamp, droneSerialNumber to the pilot object
-                  data.closestDistance = distance;
-                  data.snapshotTimestamp = timeStamp;
-                  data.droneSerialNumber = drone.serialNumber._text;
-                });
+                pilot
+                  .then((data) => {
+                    // Adding closestDistance, snapshotTimestamp, droneSerialNumber to the pilot object
+                    data.closestDistance = distance;
+                    data.snapshotTimestamp = timeStamp;
+                    data.droneSerialNumber = drone.serialNumber._text;
+                    data.lastSeenMinAgo = 0;
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
                 return pilot;
               }
             );
@@ -113,9 +138,9 @@ function getData() {
     // Assigning or updatinng data to pilotsInfoList
     .then((data) => {
       // if pilotsInfoList is undefined assign data
-      if (pilotsInfoList === undefined && data.length > 0) {
+      if (!pilotsInfoList && data && data.length > 0) {
         pilotsInfoList = data;
-      } else if (data.length > 0) {
+      } else if (pilotsInfoList && data && data.length > 0) {
         data.forEach((pilot) => {
           // Pilot found in existing list
           const foundPilot = pilotsInfoList.find(
@@ -140,24 +165,27 @@ function getData() {
     })
     // Filter out pilots seen more than 10 minutes ago in NDZ
     .then(() => {
-      const updatedPilotsLIST = pilotsInfoList
-        ? pilotsInfoList.filter((pilot) => {
-            if (
+      if (pilotsInfoList) {
+        // Add lastSeenMinAgo data to pilot
+        const updatedPilots = pilotsInfoList.map((pilot) => {
+          return {
+            ...pilot,
+            lastSeenMinAgo:
               Date.parse(timeStamp) / 1000 / 60 -
-                Date.parse(pilot.snapshotTimestamp) / 1000 / 60 <
-              10
-            ) {
-              return pilot;
-            }
-          })
-        : null;
-      // Only update pilots list if some pilots were filtered out
-      if (
-        updatedPilotsLIST &&
-        updatedPilotsLIST.length < pilotsInfoList.length
-      ) {
-        //replacing content of array: splice(start, deleteCount, item1)
-        pilotsInfoList.splice(0, pilotsInfoList.length, ...updatedPilotsLIST);
+              Date.parse(pilot.snapshotTimestamp) / 1000 / 60,
+          };
+        });
+
+        const filteredPilosts = updatedPilots.filter((pilot) => {
+          if (pilot.lastSeenMinAgo <= 10) {
+            return pilot;
+          }
+        });
+        //  Update pilotsInfoList
+        if (pilotsInfoList && filteredPilosts) {
+          //replacing content of array: splice(start, deleteCount, item1)
+          pilotsInfoList.splice(0, pilotsInfoList.length, ...filteredPilosts);
+        }
       }
     })
     .catch((error) => {
@@ -177,7 +205,6 @@ function getData() {
   });
 }
 
-// Functoins that return values of corresponding variables
 function getAllDronesList() {
   return allDronesList;
 }
