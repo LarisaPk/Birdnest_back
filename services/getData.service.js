@@ -29,6 +29,17 @@ function calculateDistance(nestX, nestY, droneX, droneY) {
   return distance / 1000; //distance to the nest in meters
 }
 
+// Organising pilots alphabetically by Lastname. used like this: obj.sort( compare );
+function compare(a, b) {
+  if (a.lastName < b.lastName) {
+    return -1;
+  }
+  if (a.lastName > b.lastName) {
+    return 1;
+  }
+  return 0;
+}
+
 function getData() {
   let timeStamp;
   //This promise will resolve when the network call succeeds
@@ -139,7 +150,7 @@ function getData() {
     .then((data) => {
       // if pilotsInfoList is undefined assign data
       if (!pilotsInfoList && data && data.length > 0) {
-        pilotsInfoList = data;
+        pilotsInfoList = data.sort(compare);
       } else if (pilotsInfoList && data && data.length > 0) {
         data.forEach((pilot) => {
           // Pilot found in existing list
@@ -183,6 +194,7 @@ function getData() {
         });
         //  Update pilotsInfoList
         if (pilotsInfoList && filteredPilosts) {
+          filteredPilosts.sort(compare);
           //replacing content of array: splice(start, deleteCount, item1)
           pilotsInfoList.splice(0, pilotsInfoList.length, ...filteredPilosts);
         }
