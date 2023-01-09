@@ -14,6 +14,16 @@ const nestPositionX = 250000;
 const nestPositionY = 250000;
 const NDZRadius = 100 * 1000; // radius in units
 
+// Used as template when no information found about pilot
+const unknownPilot = {
+  pilotId: "Unknown",
+  firstName: "Unknown",
+  lastName: "Unknown",
+  phoneNumber: "Unknown",
+  createdDt: "Unknown",
+  email: "Unknown",
+};
+
 // The general equation of a circle with radius r and origin (𝑥0,𝑦0) is (𝑥−𝑥0 ) ** 2 + (𝑦−𝑦0) ** 2 = r ** 2
 // The point (x, y) lies outside, on or inside the circle
 // accordingly as the expression (𝑥−𝑥0) ** 2 + (𝑦−𝑦0) ** 2 - r ** 2 is positive, zero or negative.
@@ -110,21 +120,36 @@ function assignDronesInNDZList(data) {
 
         // If it is a new pilot, fetch and return data (not fetching data for pilots that are already on the list)
       } else {
-        return fetch(pilotInfoURL + drone.serialNumber._text).then((data) => {
-          const pilot = Promise.resolve(data.json());
-          pilot
-            .then((data) => {
-              // Adding closestDistance, snapshotTimestamp, droneSerialNumber to the pilot object
-              data.closestDistance = distance;
-              data.snapshotTimestamp = timeStamp;
-              data.droneSerialNumber = drone.serialNumber._text;
-              data.lastSeenMinAgo = 0;
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          return pilot;
-        });
+        return fetch(pilotInfoURL + drone.serialNumber._text)
+          .then((response) => {
+            if (response.ok) {
+              const pilot = Promise.resolve(response.json());
+              pilot
+                .then((data) => {
+                  // Adding closestDistance, snapshotTimestamp, droneSerialNumber to the pilot object
+                  data.closestDistance = distance;
+                  data.snapshotTimestamp = timeStamp;
+                  data.droneSerialNumber = drone.serialNumber._text;
+                  data.lastSeenMinAgo = 0;
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+              return pilot;
+            } else if (response.status === 404) {
+              console.log("Pilot infromation is not found");
+              return {
+                ...unknownPilot,
+                closestDistance: distance,
+                snapshotTimestamp: timeStamp,
+                droneSerialNumber: drone.serialNumber._text,
+                lastSeenMinAgo: 0,
+              };
+            } else {
+              return Promise.reject("some other error: " + response.status);
+            }
+          })
+          .catch((error) => console.log("error is", error));
       }
     })
   );
@@ -139,12 +164,13 @@ function updatePilotsList(data) {
     data.forEach((pilot) => {
       // Pilot found in existing list
       const foundPilot = pilotsInfoList.find(
-        ({ pilotId }) => pilotId === pilot.pilotId
+        ({ droneSerialNumber }) => droneSerialNumber === pilot.droneSerialNumber
       );
       if (foundPilot) {
         // Find pilot index
         const foundPilotIndex = pilotsInfoList.findIndex(
-          ({ pilotId }) => pilotId === pilot.pilotId
+          ({ droneSerialNumber }) =>
+            droneSerialNumber === pilot.droneSerialNumber
         );
         // Update closest distance to the nest
         pilotsInfoList[foundPilotIndex].closestDistance = pilot.closestDistance;
