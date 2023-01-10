@@ -1,10 +1,10 @@
 // Contains the majority of logic. Calls external API, processes the data and stores it in variables.
 // Exports getData function and variables allDronesList, dronesInNDZList, pilotsInfoList
 
-const convert = require("xml-js");
+const convert = require('xml-js');
 
 const allDronesURL = process.env.DRONES_URL;
-const pilotInfoURL = process.env.PILOT_URL; //add :serialNumber to the request parameter
+const pilotInfoURL = process.env.PILOT_URL; // Add :serialNumber to the request parameter
 
 let allDronesList;
 let dronesInNDZList;
@@ -13,32 +13,33 @@ let timeStamp;
 
 const nestPositionX = 250000;
 const nestPositionY = 250000;
-const NDZRadius = 100 * 1000; // radius in units
+const NDZRadius = 100 * 1000; // Radius in units
 
 // Used as template when no information found about pilot
 const unknownPilot = {
-  pilotId: "Unknown",
-  firstName: "Unknown",
-  lastName: "Unknown",
-  phoneNumber: "Unknown",
-  createdDt: "Unknown",
-  email: "Unknown",
+  pilotId: 'Unknown',
+  firstName: 'Unknown',
+  lastName: 'Unknown',
+  phoneNumber: 'Unknown',
+  createdDt: 'Unknown',
+  email: 'Unknown',
 };
 
 // The general equation of a circle with radius r and origin (𝑥0,𝑦0) is (𝑥−𝑥0 ) ** 2 + (𝑦−𝑦0) ** 2 = r ** 2
 // The point (x, y) lies outside, on or inside the circle
 // accordingly as the expression (𝑥−𝑥0) ** 2 + (𝑦−𝑦0) ** 2 - r ** 2 is positive, zero or negative.
-function isInsideNDZ(nestX, nestY, NDZRadius, droneX, droneY) {
-  if ((droneX - nestX) ** 2 + (droneY - nestY) ** 2 <= NDZRadius ** 2)
+function isInsideNDZ(nestX, nestY, NdzRadius, droneX, droneY) {
+  if ((droneX - nestX) ** 2 + (droneY - nestY) ** 2 <= NdzRadius ** 2) {
     return true;
-  else return false;
+  }
+  return false;
 }
 
 // From the equation of the circle, distance between the points (𝑥1,𝑦1) and (𝑥2,𝑦2)
 // is 𝐷 = Math.sqrt((𝑥2−𝑥1)**2+(𝑦2−𝑦1)**2
 function calculateDistance(nestX, nestY, droneX, droneY) {
   const distance = Math.sqrt((droneX - nestX) ** 2 + (droneY - nestY) ** 2);
-  return distance / 1000; //distance to the nest in meters
+  return distance / 1000; // Distance to the nest in meters
 }
 
 // Organising pilots alphabetically by Last Name. used like this: obj.sort( compare );
@@ -62,19 +63,15 @@ function assignAllDronesData(data) {
   }
   // saving snapshotTimestamp value to add later to the pilot object in pilotsInfoList
   timeStamp = data.report.capture._attributes.snapshotTimestamp;
-  return data.report.capture.drone.filter((drone) => {
-    if (
-      isInsideNDZ(
-        nestPositionX,
-        nestPositionY,
-        NDZRadius,
-        parseFloat(drone.positionX._text),
-        parseFloat(drone.positionY._text)
-      )
-    ) {
-      return drone;
-    }
-  });
+  return data.report.capture.drone.filter((drone) =>
+    isInsideNDZ(
+      nestPositionX,
+      nestPositionY,
+      NDZRadius,
+      parseFloat(drone.positionX._text),
+      parseFloat(drone.positionY._text)
+    )
+  );
 }
 
 // Assigning data to dronesInNDZList returning new data for pilotsInfoList
@@ -120,38 +117,43 @@ function assignDronesInNDZList(data) {
         };
 
         // If it is a new pilot, fetch and return data (not fetching data for pilots that are already on the list)
-      } else {
-        return fetch(pilotInfoURL + drone.serialNumber._text)
-          .then((response) => {
-            if (response.ok) {
-              const pilot = Promise.resolve(response.json());
-              pilot
-                .then((data) => {
-                  // Adding closestDistance, snapshotTimestamp, droneSerialNumber to the pilot object
-                  data.closestDistance = distance;
-                  data.snapshotTimestamp = timeStamp;
-                  data.droneSerialNumber = drone.serialNumber._text;
-                  data.lastSeenMinAgo = 0;
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-              return pilot;
-            } else if (response.status === 404) {
-              console.log("Pilot infromation is not found");
-              return {
-                ...unknownPilot,
-                closestDistance: distance,
-                snapshotTimestamp: timeStamp,
-                droneSerialNumber: drone.serialNumber._text,
-                lastSeenMinAgo: 0,
-              };
-            } else {
-              return Promise.reject("some other error: " + response.status);
-            }
-          })
-          .catch((error) => console.log("error is", error));
       }
+      return fetch(pilotInfoURL + drone.serialNumber._text)
+        .then((response) => {
+          if (response.ok && response.status === 200) {
+            const pilot = Promise.resolve(response.json());
+            const pilotAddedData = pilot
+              .then((pilotData) => {
+                // Adding closestDistance, snapshotTimestamp, droneSerialNumber to the pilot object
+                const result = {
+                  ...pilotData,
+                  closestDistance: distance,
+                  snapshotTimestamp: timeStamp,
+                  droneSerialNumber: drone.serialNumber._text,
+                  lastSeenMinAgo: 0,
+                };
+                return result;
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            return pilotAddedData;
+          }
+          if (response.status === 404) {
+            console.log('Pilot infromation is not found');
+            return {
+              ...unknownPilot,
+              closestDistance: distance,
+              snapshotTimestamp: timeStamp,
+              droneSerialNumber: drone.serialNumber._text,
+              lastSeenMinAgo: 0,
+            };
+          }
+          return Promise.reject(
+            new Error(`some other error: ${response.status}`)
+          );
+        })
+        .catch((error) => console.log('error is', error));
     })
   );
 }
@@ -189,31 +191,27 @@ function updatePilotsList(data) {
 function fiterPilots() {
   if (pilotsInfoList) {
     // Add lastSeenMinAgo data to pilot
-    const updatedPilots = pilotsInfoList.map((pilot) => {
-      return {
-        ...pilot,
-        lastSeenMinAgo:
-          Date.parse(timeStamp) / 1000 / 60 -
-          Date.parse(pilot.snapshotTimestamp) / 1000 / 60,
-      };
-    });
+    const updatedPilots = pilotsInfoList.map((pilot) => ({
+      ...pilot,
+      lastSeenMinAgo:
+        Date.parse(timeStamp) / 1000 / 60 -
+        Date.parse(pilot.snapshotTimestamp) / 1000 / 60,
+    }));
 
-    const filteredPilosts = updatedPilots.filter((pilot) => {
-      if (pilot.lastSeenMinAgo <= 10) {
-        return pilot;
-      }
-    });
+    const filteredPilosts = updatedPilots.filter(
+      (pilot) => pilot.lastSeenMinAgo <= 10
+    );
     //  Update pilotsInfoList
     if (pilotsInfoList && filteredPilosts) {
       filteredPilosts.sort(compare);
-      //replacing content of array: splice(start, deleteCount, item1)
+      // replacing content of array: splice(start, deleteCount, item1)
       pilotsInfoList.splice(0, pilotsInfoList.length, ...filteredPilosts);
     }
   }
 }
 
 function getData() {
-  //This promise will resolve when the network call succeeds
+  // This promise will resolve when the network call succeeds
   const networkPromise = fetch(allDronesURL)
     .then((response) => response.text())
     // Converting XML to JSON and then to object
@@ -221,13 +219,9 @@ function getData() {
       JSON.parse(convert.xml2json(data, { compact: true, spaces: 2 }))
     )
     // Assigning data to allDronesList, returning data for dronesInNDZList
-    .then((data) => {
-      return assignAllDronesData(data);
-    })
+    .then((data) => assignAllDronesData(data))
     // Assigning data to dronesInNDZList returning new data for pilotsInfoList
-    .then((data) => {
-      return assignDronesInNDZList(data);
-    })
+    .then((data) => assignDronesInNDZList(data))
     // Assigning or updatinng data to pilotsInfoList
     .then((data) => {
       updatePilotsList(data);
@@ -240,15 +234,15 @@ function getData() {
       console.log(error);
     });
 
-  //This promise will resolve when 2 seconds have passed
-  const timeOutPromise = new Promise(function (resolve, reject) {
+  // This promise will resolve when 2 seconds have passed
+  const timeOutPromise = new Promise((resolve, reject) => {
     // 2 Second delay
-    setTimeout(resolve, 2000, "Timeout Done");
+    setTimeout(resolve, 2000, 'Timeout Done');
   });
 
   Promise.all([networkPromise, timeOutPromise]).then(() => {
-    console.log("Atleast 2 secs + TTL (Network/server)");
-    //Repeat
+    console.log('Atleast 2 secs + TTL (Network/server)');
+    // Repeat
     getData();
   });
 }

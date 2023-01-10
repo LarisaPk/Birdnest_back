@@ -1,11 +1,14 @@
-const pilotsRouter = require("express").Router();
-const getDataService = require("../services/getData.service");
+const pilotsRouter = require('express').Router();
+const getDataService = require('../services/getData.service');
 
-pilotsRouter.get("/", (request, response) => {
+// Pilots who violated NDZ for the past 10 minutes
+pilotsRouter.get('/', (request, response) => {
   const pilotsInfoList = getDataService.getPilotsInfoList();
-  pilotsInfoList
-    ? response.json(pilotsInfoList)
-    : response.status(404).send({ error: "pilots data is not ready yet" });
+  if (pilotsInfoList !== 'undefined') {
+    response.json(pilotsInfoList);
+  } else {
+    response.status(404).send({ error: 'pilots data is not ready yet' });
+  }
 });
 
 module.exports = pilotsRouter;

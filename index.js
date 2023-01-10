@@ -1,5 +1,5 @@
-const app = require("./app"); // actuall Express-app
-const http = require("http");
+const http = require('http');
+const app = require('./app'); // actuall Express-app
 
 const server = http.createServer(app);
 

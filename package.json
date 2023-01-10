@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "description": "Project for the Reaktor Developer Trainee, summer 2023 application",
   "main": "index.js",
+  "engines": {
+    "node": ">=8.10.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "lint": "npx eslint src test",
+    "lint:fix": "npm run lint -- --fix"
   },
   "author": "Larisa Pyykölä",
   "license": "MIT",
@@ -17,7 +22,13 @@
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
+    "eslint": "^8.31.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-node": "^4.1.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "nodemon": "^2.0.20",
-    "prettier": "^2.8.1"
+    "prettier": "^2.8.2"
   }
 }
