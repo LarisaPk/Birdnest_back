@@ -1,9 +1,10 @@
 // Contains the majority of logic. Calls external API, processes the data and stores it in variables.
 // Exports getData function and variables allDronesList, dronesInNDZList, pilotsInfoList
+
 const convert = require("xml-js");
 
-var allDronesURL = "https://assignments.reaktor.com/birdnest/drones";
-var pilotInfoURL = "https://assignments.reaktor.com/birdnest/pilots/"; //add :serialNumber to the request parameter
+const allDronesURL = process.env.DRONES_URL;
+const pilotInfoURL = process.env.PILOT_URL; //add :serialNumber to the request parameter
 
 let allDronesList;
 let dronesInNDZList;
