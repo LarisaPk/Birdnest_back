@@ -1,7 +1,9 @@
 // Contains the majority of logic. Calls external API, processes the data and stores it in variables.
 // Exports getData function and variables allDronesList, dronesInNDZList, pilotsInfoList
+
 const convert = require('xml-js');
-const getDataHelpers = require('../utils/getData.helpers');
+const getDataHelpers = require('../utils/getData.math.helpers');
+const constants = require('../constants/constants.index');
 
 const allDronesURL = process.env.DRONES_URL;
 const pilotInfoURL = process.env.PILOT_URL; // Add :serialNumber to the request parameter
@@ -10,20 +12,6 @@ let allDronesList;
 let dronesInNDZList;
 let pilotsInfoList;
 let timeStamp;
-
-const nestPositionX = 250000;
-const nestPositionY = 250000;
-const NDZRadius = 100 * 1000; // Radius in units
-
-// Used as template when no information found about pilot
-const unknownPilot = {
-  pilotId: 'Unknown',
-  firstName: 'Unknown',
-  lastName: 'Unknown',
-  phoneNumber: 'Unknown',
-  createdDt: 'Unknown',
-  email: 'Unknown',
-};
 
 // Assigning data to allDronesList, returning data for dronesInNDZList, assigning timeStamp
 function assignAllDronesData(data) {
@@ -37,9 +25,9 @@ function assignAllDronesData(data) {
   timeStamp = data.report.capture._attributes.snapshotTimestamp;
   return data.report.capture.drone.filter((drone) =>
     getDataHelpers.isInside(
-      nestPositionX,
-      nestPositionY,
-      NDZRadius,
+      constants.nestPositionX,
+      constants.nestPositionY,
+      constants.NDZRadius,
       parseFloat(drone.positionX._text),
       parseFloat(drone.positionY._text)
     )
@@ -60,8 +48,8 @@ function assignDronesInNDZList(data) {
     data.map((drone) => {
       // calculate distance to the nest
       const distance = getDataHelpers.calculateDistance(
-        nestPositionX,
-        nestPositionY,
+        constants.nestPositionX,
+        constants.nestPositionY,
         parseFloat(drone.positionX._text),
         parseFloat(drone.positionY._text)
       );
@@ -115,7 +103,7 @@ function assignDronesInNDZList(data) {
           if (response.status === 404) {
             console.log('Pilot infromation is not found');
             return {
-              ...unknownPilot,
+              ...constants.unknownPilot,
               closestDistance: distance,
               snapshotTimestamp: timeStamp,
               droneSerialNumber: drone.serialNumber._text,
@@ -196,16 +184,10 @@ function getData() {
     // Assigning data to dronesInNDZList returning new data for pilotsInfoList
     .then((data) => assignDronesInNDZList(data))
     // Assigning or updatinng data to pilotsInfoList
-    .then((data) => {
-      updatePilotsList(data);
-    })
+    .then((data) => updatePilotsList(data))
     // Filter out pilots seen more than 10 minutes ago in NDZ
-    .then(() => {
-      fiterPilots();
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+    .then(() => fiterPilots())
+    .catch((error) => console.log(error));
 
   // This promise will resolve when 2 seconds have passed
   const timeOutPromise = new Promise((resolve, reject) => {
@@ -213,7 +195,7 @@ function getData() {
     setTimeout(resolve, 2000, 'Timeout Done');
   });
 
-  // Making sure that both promises resolve before moving on. In case of for ex. slow Internet speed.
+  // Making sure that both promises resolve before moving on. In case of for example slow Internet.
   Promise.all([networkPromise, timeOutPromise]).then(() => {
     console.log('Atleast 2 secs + TTL (Network/server)');
     // Repeat
