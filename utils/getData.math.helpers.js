@@ -15,7 +15,7 @@ function calculateDistance(centerX, centerY, pointX, pointY) {
   return distance / 1000; // Distance to the nest in meters
 }
 
-// Organising pilots alphabetically by Last Name. used like this: obj.sort( compare );
+// Organising objects alphabetically by Last Name. Used like this: obj.sort( compare );
 function compare(a, b) {
   if (a.lastName < b.lastName) {
     return -1;

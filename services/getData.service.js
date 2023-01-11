@@ -2,29 +2,23 @@
 // Exports getData function and variables allDronesList, dronesInNDZList, pilotsInfoList
 
 const convert = require('xml-js');
-const getDataHelpers = require('../utils/getData.math.helpers');
+const mathHelpers = require('../utils/getData.math.helpers');
+// const processingHelpers = require('../utils/getData.processing.helpers');
 const constants = require('../constants/constants.index');
+const dataService = require('./appData.service');
 
 const allDronesURL = process.env.DRONES_URL;
 const pilotInfoURL = process.env.PILOT_URL; // Add :serialNumber to the request parameter
 
-let allDronesList;
-let dronesInNDZList;
-let pilotsInfoList;
-let timeStamp;
-
-// Assigning data to allDronesList, returning data for dronesInNDZList, assigning timeStamp
+// Assigning data to allDronesList, assigning timeStamp, returning data for dronesInNDZList
 function assignAllDronesData(data) {
-  // if allDronesList is undefined assignt data to it
-  if (!allDronesList && data && data.report.capture.drone.length > 0) {
-    allDronesList = data.report.capture.drone;
-  } else if (allDronesList && data && data.report.capture.drone.length > 0) {
-    allDronesList.splice(0, allDronesList.length, ...data.report.capture.drone);
-  }
+  dataService.setAllDronesList(data);
+
   // saving snapshotTimestamp value to add later to the pilot object in pilotsInfoList
-  timeStamp = data.report.capture._attributes.snapshotTimestamp;
+  dataService.setTimeStamp(data.report.capture._attributes.snapshotTimestamp);
+
   return data.report.capture.drone.filter((drone) =>
-    getDataHelpers.isInside(
+    mathHelpers.isInside(
       constants.nestPositionX,
       constants.nestPositionY,
       constants.NDZRadius,
@@ -36,23 +30,21 @@ function assignAllDronesData(data) {
 
 // Assigning data to dronesInNDZList returning new data for pilotsInfoList
 function assignDronesInNDZList(data) {
-  // if dronesInNDZList is undefined assign data
-  if (!dronesInNDZList && data && data.length > 0) {
-    dronesInNDZList = data;
-  } else if (dronesInNDZList && data && data.length > 0) {
-    // replacing content of array: splice(start, deleteCount, item1)
-    dronesInNDZList.splice(0, dronesInNDZList.length, ...data);
-  }
+  dataService.setDronesInNDZList(data);
   // All promises must be resolved before moving on
   return Promise.all(
     data.map((drone) => {
       // calculate distance to the nest
-      const distance = getDataHelpers.calculateDistance(
+      const distance = mathHelpers.calculateDistance(
         constants.nestPositionX,
         constants.nestPositionY,
         parseFloat(drone.positionX._text),
         parseFloat(drone.positionY._text)
       );
+
+      const pilotsInfoList = dataService.getPilotsInfoList();
+      const timeStamp = dataService.getTimeStamp();
+
       // Try to find pilot in pilotsInfoList if exists
       const foundPilot = pilotsInfoList
         ? pilotsInfoList.find(
@@ -119,58 +111,6 @@ function assignDronesInNDZList(data) {
   );
 }
 
-// Assigning or updatinng data to pilotsInfoList
-function updatePilotsList(data) {
-  // if pilotsInfoList is undefined assign data
-  if (!pilotsInfoList && data && data.length > 0) {
-    pilotsInfoList = data.sort(getDataHelpers.compare);
-  } else if (pilotsInfoList && data && data.length > 0) {
-    data.forEach((pilot) => {
-      // Pilot found in existing list
-      const foundPilot = pilotsInfoList.find(
-        ({ droneSerialNumber }) => droneSerialNumber === pilot.droneSerialNumber
-      );
-      if (foundPilot) {
-        // Find pilot index
-        const foundPilotIndex = pilotsInfoList.findIndex(
-          ({ droneSerialNumber }) =>
-            droneSerialNumber === pilot.droneSerialNumber
-        );
-        // Update closest distance to the nest
-        pilotsInfoList[foundPilotIndex].closestDistance = pilot.closestDistance;
-        // Update timeStamp when last seen
-        pilotsInfoList[foundPilotIndex].snapshotTimestamp =
-          pilot.snapshotTimestamp;
-      } else {
-        pilotsInfoList.push(pilot);
-      }
-    });
-  }
-}
-
-// Filter out pilots seen more than 10 minutes ago in NDZ
-function fiterPilots() {
-  if (pilotsInfoList) {
-    // Add lastSeenMinAgo data to pilot
-    const updatedPilots = pilotsInfoList.map((pilot) => ({
-      ...pilot,
-      lastSeenMinAgo:
-        Date.parse(timeStamp) / 1000 / 60 -
-        Date.parse(pilot.snapshotTimestamp) / 1000 / 60,
-    }));
-
-    const filteredPilosts = updatedPilots.filter(
-      (pilot) => pilot.lastSeenMinAgo <= 10
-    );
-    //  Update pilotsInfoList
-    if (pilotsInfoList && filteredPilosts) {
-      filteredPilosts.sort(getDataHelpers.compare);
-      // replacing content of array: splice(start, deleteCount, item1)
-      pilotsInfoList.splice(0, pilotsInfoList.length, ...filteredPilosts);
-    }
-  }
-}
-
 function getData() {
   // This promise will resolve when the network call succeeds
   const networkPromise = fetch(allDronesURL)
@@ -184,9 +124,9 @@ function getData() {
     // Assigning data to dronesInNDZList returning new data for pilotsInfoList
     .then((data) => assignDronesInNDZList(data))
     // Assigning or updatinng data to pilotsInfoList
-    .then((data) => updatePilotsList(data))
+    .then((data) => dataService.setPilotsInfoList(data))
     // Filter out pilots seen more than 10 minutes ago in NDZ
-    .then(() => fiterPilots())
+    .then(() => dataService.fiterPilots())
     .catch((error) => console.log(error));
 
   // This promise will resolve when 2 seconds have passed
@@ -203,21 +143,6 @@ function getData() {
   });
 }
 
-function getAllDronesList() {
-  return allDronesList;
-}
-
-function getDronesInNDZList() {
-  return dronesInNDZList;
-}
-
-function getPilotsInfoList() {
-  return pilotsInfoList;
-}
-
 module.exports = {
   getData,
-  getAllDronesList,
-  getDronesInNDZList,
-  getPilotsInfoList,
 };

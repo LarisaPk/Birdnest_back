@@ -1,9 +1,9 @@
 const dronesRouter = require('express').Router();
-const getDataService = require('../services/getData.service');
+const dataService = require('../services/appData.service');
 
 // All drones
 dronesRouter.get('/now', (request, response) => {
-  const allDronesList = getDataService.getAllDronesList();
+  const allDronesList = dataService.getAllDronesList();
   if (allDronesList) {
     response.json(allDronesList);
   } else {
@@ -13,7 +13,7 @@ dronesRouter.get('/now', (request, response) => {
 
 // Drones in NDZ
 dronesRouter.get('/ndz', (request, response) => {
-  const dronesInNDZList = getDataService.getDronesInNDZList();
+  const dronesInNDZList = dataService.getDronesInNDZList();
   if (dronesInNDZList) {
     response.json(dronesInNDZList);
   } else {

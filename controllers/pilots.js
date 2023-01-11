@@ -1,9 +1,9 @@
 const pilotsRouter = require('express').Router();
-const getDataService = require('../services/getData.service');
+const dataService = require('../services/appData.service');
 
 // Pilots who violated NDZ for the past 10 minutes
 pilotsRouter.get('/', (request, response) => {
-  const pilotsInfoList = getDataService.getPilotsInfoList();
+  const pilotsInfoList = dataService.getPilotsInfoList();
   if (pilotsInfoList) {
     response.json(pilotsInfoList);
   } else {
