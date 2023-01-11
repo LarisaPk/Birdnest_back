@@ -1,5 +1,6 @@
 // Contains data for the app and needed functions
 
+const constants = require('../constants/constants.index');
 const mathHelpers = require('../utils/getData.math.helpers');
 
 let allDronesList;
@@ -46,6 +47,7 @@ function setDronesInNDZList(data) {
   }
 }
 
+// Update current list or add new pilot to it
 function setPilotsInfoList(data) {
   // if pilotsInfoList is undefined assign data
   if (!pilotsInfoList && data && data.length > 0) {
@@ -74,7 +76,7 @@ function setPilotsInfoList(data) {
   }
 }
 
-// Filter out pilots seen more than 10 minutes ago in NDZ
+// Filter out pilots seen more than 10 minutes ago in NDZ, sort by Last Name
 function fiterPilots() {
   if (pilotsInfoList) {
     // Add lastSeenMinAgo data to pilot
@@ -97,6 +99,24 @@ function fiterPilots() {
   }
 }
 
+// Assigning data to allDronesList, assigning timeStamp, filtering drones, returning data for dronesInNDZList
+function filterDrones(data) {
+  setAllDronesList(data);
+
+  // saving snapshotTimestamp value to add later to the pilot object in pilotsInfoList
+  setTimeStamp(data.report.capture._attributes.snapshotTimestamp);
+
+  return data.report.capture.drone.filter((drone) =>
+    mathHelpers.isInside(
+      constants.nestPositionX,
+      constants.nestPositionY,
+      constants.NDZRadius,
+      parseFloat(drone.positionX._text),
+      parseFloat(drone.positionY._text)
+    )
+  );
+}
+
 module.exports = {
   getTimeStamp,
   getAllDronesList,
@@ -107,4 +127,5 @@ module.exports = {
   setDronesInNDZList,
   setPilotsInfoList,
   fiterPilots,
+  filterDrones,
 };
