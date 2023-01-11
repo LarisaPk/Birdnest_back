@@ -4,7 +4,7 @@ const getDataService = require('../services/getData.service');
 // All drones
 dronesRouter.get('/now', (request, response) => {
   const allDronesList = getDataService.getAllDronesList();
-  if (allDronesList !== 'undefined') {
+  if (allDronesList) {
     response.json(allDronesList);
   } else {
     response.status(404).send({ error: 'all drones data is not ready yet' });
@@ -14,7 +14,7 @@ dronesRouter.get('/now', (request, response) => {
 // Drones in NDZ
 dronesRouter.get('/ndz', (request, response) => {
   const dronesInNDZList = getDataService.getDronesInNDZList();
-  if (dronesInNDZList !== 'undefined') {
+  if (dronesInNDZList) {
     response.json(dronesInNDZList);
   } else {
     response.status(404).send({ error: 'drones in ndz data is not ready yet' });

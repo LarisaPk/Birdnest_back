@@ -1,7 +1,7 @@
 // Contains the majority of logic. Calls external API, processes the data and stores it in variables.
 // Exports getData function and variables allDronesList, dronesInNDZList, pilotsInfoList
-
 const convert = require('xml-js');
+const getDataHelpers = require('../utils/getData.helpers');
 
 const allDronesURL = process.env.DRONES_URL;
 const pilotInfoURL = process.env.PILOT_URL; // Add :serialNumber to the request parameter
@@ -25,34 +25,6 @@ const unknownPilot = {
   email: 'Unknown',
 };
 
-// The general equation of a circle with radius r and origin (𝑥0,𝑦0) is (𝑥−𝑥0 ) ** 2 + (𝑦−𝑦0) ** 2 = r ** 2
-// The point (x, y) lies outside, on or inside the circle
-// accordingly as the expression (𝑥−𝑥0) ** 2 + (𝑦−𝑦0) ** 2 - r ** 2 is positive, zero or negative.
-function isInsideNDZ(nestX, nestY, NdzRadius, droneX, droneY) {
-  if ((droneX - nestX) ** 2 + (droneY - nestY) ** 2 <= NdzRadius ** 2) {
-    return true;
-  }
-  return false;
-}
-
-// From the equation of the circle, distance between the points (𝑥1,𝑦1) and (𝑥2,𝑦2)
-// is 𝐷 = Math.sqrt((𝑥2−𝑥1)**2+(𝑦2−𝑦1)**2
-function calculateDistance(nestX, nestY, droneX, droneY) {
-  const distance = Math.sqrt((droneX - nestX) ** 2 + (droneY - nestY) ** 2);
-  return distance / 1000; // Distance to the nest in meters
-}
-
-// Organising pilots alphabetically by Last Name. used like this: obj.sort( compare );
-function compare(a, b) {
-  if (a.lastName < b.lastName) {
-    return -1;
-  }
-  if (a.lastName > b.lastName) {
-    return 1;
-  }
-  return 0;
-}
-
 // Assigning data to allDronesList, returning data for dronesInNDZList, assigning timeStamp
 function assignAllDronesData(data) {
   // if allDronesList is undefined assignt data to it
@@ -64,7 +36,7 @@ function assignAllDronesData(data) {
   // saving snapshotTimestamp value to add later to the pilot object in pilotsInfoList
   timeStamp = data.report.capture._attributes.snapshotTimestamp;
   return data.report.capture.drone.filter((drone) =>
-    isInsideNDZ(
+    getDataHelpers.isInside(
       nestPositionX,
       nestPositionY,
       NDZRadius,
@@ -80,13 +52,14 @@ function assignDronesInNDZList(data) {
   if (!dronesInNDZList && data && data.length > 0) {
     dronesInNDZList = data;
   } else if (dronesInNDZList && data && data.length > 0) {
+    // replacing content of array: splice(start, deleteCount, item1)
     dronesInNDZList.splice(0, dronesInNDZList.length, ...data);
   }
   // All promises must be resolved before moving on
   return Promise.all(
     data.map((drone) => {
       // calculate distance to the nest
-      const distance = calculateDistance(
+      const distance = getDataHelpers.calculateDistance(
         nestPositionX,
         nestPositionY,
         parseFloat(drone.positionX._text),
@@ -162,7 +135,7 @@ function assignDronesInNDZList(data) {
 function updatePilotsList(data) {
   // if pilotsInfoList is undefined assign data
   if (!pilotsInfoList && data && data.length > 0) {
-    pilotsInfoList = data.sort(compare);
+    pilotsInfoList = data.sort(getDataHelpers.compare);
   } else if (pilotsInfoList && data && data.length > 0) {
     data.forEach((pilot) => {
       // Pilot found in existing list
@@ -203,7 +176,7 @@ function fiterPilots() {
     );
     //  Update pilotsInfoList
     if (pilotsInfoList && filteredPilosts) {
-      filteredPilosts.sort(compare);
+      filteredPilosts.sort(getDataHelpers.compare);
       // replacing content of array: splice(start, deleteCount, item1)
       pilotsInfoList.splice(0, pilotsInfoList.length, ...filteredPilosts);
     }
@@ -240,6 +213,7 @@ function getData() {
     setTimeout(resolve, 2000, 'Timeout Done');
   });
 
+  // Making sure that both promises resolve before moving on. In case of for ex. slow Internet speed.
   Promise.all([networkPromise, timeOutPromise]).then(() => {
     console.log('Atleast 2 secs + TTL (Network/server)');
     // Repeat
