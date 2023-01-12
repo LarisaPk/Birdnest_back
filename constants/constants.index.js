@@ -1,10 +1,30 @@
-// Constants used in the project
+/**
+ * Module that contains constants.
+ * @module constants/constants.index
+ */
 
+/**
+ * Nest position X coordinates within a 500 by 500 meter square.
+ * @const {number}
+ */
 const nestPositionX = 250000;
-const nestPositionY = 250000;
-const NDZRadius = 100 * 1000; // Radius in units
 
-// Used as template when no information found about pilot
+/**
+ * Nest position Y coordinates within a 500 by 500 meter square.
+ * @const {number}
+ */
+const nestPositionY = 250000;
+
+/**
+ * Radius of no-fly zone in cordinates units (100 meters).
+ * @const {number}
+ */
+const NDZRadius = 100 * 1000;
+
+/**
+ * Template for not found pilot.
+ * @const {Object.<string, string>}
+ */
 const unknownPilot = {
   pilotId: 'Unknown',
   firstName: 'Unknown',

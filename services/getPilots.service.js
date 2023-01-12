@@ -1,10 +1,43 @@
+/**
+ * Fetches/updates pilots data
+ * @module services/getPilots.service
+ */
+
+/**
+ * Module contains helper functions to do mathematical calculations.
+ * @type {object}
+ * @const
+ */
 const mathHelpers = require('../utils/getData.math.helpers');
+
+/**
+ * Module contains constants.
+ * @type {object}
+ * @const
+ */
 const constants = require('../constants/constants.index');
+
+/**
+ * Module contains data for the app and needed functions for data manipulating.
+ * @type {object}
+ * @const
+ */
 const dataService = require('./appData.service');
 
-const pilotInfoURL = process.env.PILOT_URL; // Add :serialNumber to the request parameter
+/**
+ * External API URL for fetching pilots data. Stored in .env/environment variables
+ * Add :serialNumber to the request parameter
+ * @const {string}
+ */
+const pilotInfoURL = process.env.PILOT_URL;
 
-// Assigning data to dronesInNDZList returning new data for pilotsInfoList
+/**
+ * Assigning data to dronesInNDZList.
+ * Returns pilots who violated No Drone Zone, or coppies pilots from the current list if exist.
+ * @function
+ * @param {object[]} data drones in No Drone Zone list
+ * @returns {object[]} updated list of pilots who violated NDZ.
+ */
 function getPilots(data) {
   dataService.setDronesInNDZList(data);
   // All promises must be resolved before moving on

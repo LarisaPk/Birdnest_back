@@ -1,12 +1,41 @@
-// Main function for the app logic.
-// Calls external API, processes the data and stores it in variables.
+/**
+ * Main function for the app logic.
+ * Calls external API, processes the data and stores it in variables.
+ * @module services/getData.service
+ */
 
+/**
+ * Convert XML text to Javascript object / JSON text (and vice versa).
+ * Check it out: {@link https://www.npmjs.com/package/xml-js|xml-js}
+ * @type {object}
+ */
 const convert = require('xml-js');
+
+/**
+ * Module contains data for the app and needed functions for data manipulating.
+ * @type {object}
+ * @const
+ */
 const dataService = require('./appData.service');
+
+/**
+ * Module that fetches from external API and returnes new data for pilotsInfoList
+ * @type {object}
+ * @const
+ */
 const getPilotsService = require('./getPilots.service');
 
+/**
+ * External API URL for fetching all drones data. Stored in .env/environment variables
+ * @const {string}
+ */
 const allDronesURL = process.env.DRONES_URL;
 
+/**
+ * Fetches all drones data, pilots data and processes it.
+ * Calls itself again after minimum 2 seconds delay and when all promisses resolved.
+ * @function
+ */
 function getData() {
   // This promise will resolve when the network call succeeds
   const networkPromise = fetch(allDronesURL)

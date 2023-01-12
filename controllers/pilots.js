@@ -1,7 +1,34 @@
+/**
+ * Express router providing pilots related routes
+ * @module controllers/pilots
+ * @requires express
+ */
+
+/**
+ * Express router to mount drones related functions on.
+ * @type {object}
+ * @const
+ * @namespace dronesRouter
+ */
 const pilotsRouter = require('express').Router();
+
+/**
+ * Module contains data for the app and needed functions for data manipulating.
+ * @type {object}
+ * @const
+ * @namespace dataService
+ */
 const dataService = require('../services/appData.service');
 
-// Pilots who violated NDZ for the past 10 minutes
+/**
+ * Route serving pilots who violated No Drone Zone for the past 10 minutes.
+ * @name api/pilots
+ * @function
+ * @memberof module:controllers/pilots~pilotsRouter
+ * @inner
+ * @param {string} path - Express path
+ * @param {callback} middleware - Express middleware.
+ */
 pilotsRouter.get('/', (request, response) => {
   const pilotsInfoList = dataService.getPilotsInfoList();
   if (pilotsInfoList) {
