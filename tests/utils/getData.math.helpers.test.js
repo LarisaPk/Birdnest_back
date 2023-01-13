@@ -103,6 +103,7 @@ describe('Tests for compare function', () => {
 
     expect(result).toBe(-1);
   });
+
   test('Object a goes second', () => {
     const a = {
       lastName: 'Valo',
@@ -115,6 +116,7 @@ describe('Tests for compare function', () => {
 
     expect(result).toBe(1);
   });
+
   test('Keep current order', () => {
     const a = {
       lastName: 'Aalto',

@@ -84,7 +84,7 @@ function getPilotsInfoList() {
 /**
  * Sets TimeStamp value.
  * @function
- * @param {string} data ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)
+ * @param {string} data ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ). Assuming that format of the data is validated at the external API.
  */
 function setTimeStamp(data) {
   timeStamp = data;
