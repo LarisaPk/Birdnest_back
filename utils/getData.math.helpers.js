@@ -8,6 +8,7 @@
  * The general equation of a circle with radius r and origin (𝑥0,𝑦0) is (𝑥−𝑥0 ) ** 2 + (𝑦−𝑦0) ** 2 = r ** 2.
  * The point (x, y) lies outside, on or inside the circle
  * accordingly as the expression (𝑥−𝑥0) ** 2 + (𝑦−𝑦0) ** 2 - r ** 2 is positive, zero or negative.
+ * Check it out: {@link https://doubleroot.in/lessons/circle/position-of-a-point/#:~:text=If%20the%20distance%20is%20greater,As%20simple%20as%20that!|Position of a point relative to a circle}
  * @function
  * @param {number} centerX X coordinates of the cetner of the circle
  * @param {number} centerY Y coordinates of the cetner of the circle
@@ -27,6 +28,7 @@ function isInside(centerX, centerY, raduis, pointX, pointY) {
  * Calculates distance between center and the point.
  * From the equation of the circle, distance between the points (𝑥1,𝑦1) and (𝑥2,𝑦2)
  * is 𝐷 = Math.sqrt((𝑥2−𝑥1)**2+(𝑦2−𝑦1)**2
+ * Check it out: {@link https://www.whitman.edu/mathematics/calculus_online/section01.02.html|Distance Between Two Points; Circles}
  * @function
  * @param {number} centerX X coordinates of the cetner of the circle
  * @param {number} centerY Y coordinates of the cetner of the circle
@@ -42,6 +44,7 @@ function calculateDistance(centerX, centerY, pointX, pointY) {
 /**
  * Compares objects by given properties
  * Used like this: obj.sort( compare )
+ * Check it out: {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort|Array.prototype.sort()}
  * @example
  * pilots.sort(compare)
  * @function
@@ -49,7 +52,7 @@ function calculateDistance(centerX, centerY, pointX, pointY) {
  * @param {Object} b
  * @param {string} a.lastName Last Name of the pilot a
  * @param {string} b.lastName Last Name of the pilot b
- * @returns {number} positive if first pilot goes higher on the list, negative if first pilot goes lower on the list, 0 if the same.
+ * @returns {number} negative if first pilot goes higher on the list, positive if first pilot goes lower on the list, 0 if the same.
  */
 function compare(a, b) {
   if (a.lastName < b.lastName) {
