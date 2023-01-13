@@ -1,6 +1,6 @@
 /**
- * Module that contains constants.
- * @module constants/constants.index
+ * Module that contains constants used in the application.
+ * @module constants
  */
 
 /**
@@ -16,13 +16,13 @@ const nestPositionX = 250000;
 const nestPositionY = 250000;
 
 /**
- * Radius of no-fly zone in cordinates units (100 meters).
+ * Radius of no-fly zone in cordinates units (100 meters * 1000).
  * @const {number}
  */
 const NDZRadius = 100 * 1000;
 
 /**
- * Template for not found pilot.
+ * Template for not found pilot in the drones registery.
  * @const {Object.<string, string>}
  */
 const unknownPilot = {

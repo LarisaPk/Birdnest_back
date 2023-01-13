@@ -7,7 +7,6 @@
  * Express router to mount drones related functions on.
  * @type {object}
  * @const
- * @namespace dronesRouter
  */
 const dronesRouter = require('express').Router();
 
@@ -15,7 +14,6 @@ const dronesRouter = require('express').Router();
  * Module contains data for the app and needed functions for data manipulating.
  * @type {object}
  * @const
- * @namespace dataService
  */
 const dataService = require('../services/appData.service');
 

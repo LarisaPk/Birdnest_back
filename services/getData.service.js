@@ -1,7 +1,7 @@
 /**
  * Main function for the app logic.
  * Calls external API, processes the data and stores it in variables.
- * @module services/getData.service
+ * @module services/getData
  */
 
 /**

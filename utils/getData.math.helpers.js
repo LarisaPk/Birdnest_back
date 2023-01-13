@@ -1,6 +1,6 @@
 /**
  * Module contains helper functions to do mathematical calculations.
- * @module utils/getData.math.helpers
+ * @module utils/helpers
  */
 
 /**

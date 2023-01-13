@@ -1,6 +1,6 @@
 /**
  * Fetches/updates pilots data
- * @module services/getPilots.service
+ * @module services/getPilots
  */
 
 /**
@@ -33,7 +33,7 @@ const pilotInfoURL = process.env.PILOT_URL;
 
 /**
  * Assigning data to dronesInNDZList.
- * Returns pilots who violated No Drone Zone, or coppies pilots from the current list if exist.
+ * Returns pilots who violated No Drone Zone, fetches from API or coppies pilots from the current list if exist.
  * @function
  * @param {object[]} data drones in No Drone Zone list
  * @returns {object[]} updated list of pilots who violated NDZ.
@@ -81,6 +81,7 @@ function getPilots(data) {
       // If it is a new pilot, fetch and return data (not fetching data for pilots that are already on the list)
       return fetch(pilotInfoURL + drone.serialNumber._text)
         .then((response) => {
+          // If pilot is found in the drone registery
           if (response.ok && response.status === 200) {
             const pilot = Promise.resolve(response.json());
             const pilotAddedData = pilot
@@ -100,8 +101,12 @@ function getPilots(data) {
               });
             return pilotAddedData;
           }
+          // If pilot is not found in the drone registery
           if (response.status === 404) {
-            console.log('Pilot infromation is not found');
+            Promise.resolve('Pilot infromation is not found').then((value) => {
+              console.log(value);
+            });
+
             return {
               ...constants.unknownPilot,
               closestDistance: distance,

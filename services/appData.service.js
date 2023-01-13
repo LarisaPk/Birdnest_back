@@ -1,6 +1,6 @@
 /**
  * Contains data for the app and needed functions
- * @module services/appData.service
+ * @module services/appData
  */
 
 /**
