@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>Project Title</h1>
+<p><strong>Birdnest_backend</strong></p>
+<p>Project for the Reaktor Developer Trainee, summer 2023 application. Backend.</p>
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#objectives">Objectives</a></li>
+<li><a href="#getting_started">Getting Started</a></li>
+<li><a href="#installing">Installing</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#deployed">Deployed version</a></li>
+<li><a href="#tests">Tests</a></li>
+<li><a href="#contributing">Contributing</a></li>
+</ul>
+<h2>About</h2>
+<p>This is the pre-assignment project for Reaktor's Developer Trainee, summer 2023 programme.</p>
+<p>According to the pre-assignment, there is a birdnest of a very rare bird. Territory arround it is monitored by the equipment that locates drones presistance. Territorry with the 100 meters raduis and the birdnest in the center stated as No Fly Zone for the drones. The goal is to create an application that will display a list of pilots who ricently violated No Fly Zone.</p>
+<h3>Given data:</h3>
+<ul>
+<li>Drone positions : GET assignments.reaktor.com/birdnest/drones
+Updated about once every 2 seconds. The equipment is set up right next to the nest. XML format.</li>
+<li>Pilot information : GET assignments.reaktor.com/birdnest/pilots/:serialNumber
+Only query this information for the drones violating the NDZ. Sometimes pilot information may not be found, indicated by a 404 status code.</li>
+<li>The position of the drones are reported as X and Y coordinates, both floating point numbers between 0-500000 (within a 500 by 500 meter square)</li>
+<li>The no-fly zone is a circle with a 100 meter radius, origin at position 250000,250000</li>
+</ul>
+<p>Full text of the pre-assingment task can be found here: https://assignments.reaktor.com/birdnest/</p>
+<p>This is the backend of the project.
+Frontend can be found here: https://github.com/LarisaPk/Birdnest_front</p>
+<h2>Objectives</h2>
+<h3>Objectives of the pre-assignment</h3>
+<p>Build and deploy a web application which lists all the pilots who recently violated the NDZ perimeter.</p>
+<ul>
+<li>Persist the pilot information for 10 minutes since their drone was last seen by the equipment</li>
+<li>Display the closest confirmed distance to the nest</li>
+<li>Contain the pilot name, email address and phone number</li>
+<li>Immediately show the information from the last 10 minutes to anyone opening the application</li>
+<li>Not require the user to manually refresh the view to see up-to-date information</li>
+</ul>
+<h3>Objectives of this bakend project</h3>
+<ul>
+<li>
+<p>Repeatedly fetch data from external API with the minimun of 2 seconds intervals.</p>
+</li>
+<li>
+<p>Process the data and filter drones who violated No Fly Zone.</p>
+</li>
+<li>
+<p>Fetch the pilots of the drones in NDZ data from external API.</p>
+</li>
+<li>
+<p>Data about pilots in NDZ should be stored for 10 minutes from when their drone was last seen by the equipment.</p>
+</li>
+<li>
+<p>Process the incoming GET requests, generate and send the response to the client. JSON format.</p>
+</li>
+<li>
+<p>GET All the drones from the past snapshot<br />
+~/api/drones/now</p>
+</li>
+<li>
+<p>GET All the drones in NDZ the past snapshot<br />
+~api/drones/ndz<br />
+(not in use atm by the frontend though, used during development for testing)</p>
+</li>
+<li>
+<p>GET All the pilots in NDZ for the past 10 munutes<br />
+~/api/pilots</p>
+</li>
+</ul>
+<h2>Getting Started</h2>
+<h3>Pre-requisites</h3>
+<ul>
+<li>
+<p>&quot;node&quot;: &quot;&gt;=18.0.0&quot;
+Project uses NodeJS 18 Fetch API.
+Check that you are running the latest version of Node on your computer. Run the command <code>node -v</code> in your console to see which version you have running. If its less than 18 then you need to upgrade.</p>
+</li>
+<li>
+<p>npm (installed together with NodeJS) to check version run <code>npm -v</code><br />
+Link to NodeJS installation: https://nodejs.org/en/</p>
+</li>
+<li>
+<p>git
+check the version run <code>git --version</code><br />
+Link to installation
+https://git-scm.com/book/en/v2/Getting-Started-Installing-Git</p>
+</li>
+</ul>
+<h3>Installing</h3>
+<ul>
+<li>Create a directory where you want to download this project files and go to that directory using CLI.</li>
+<li>Download data from a remote repository using command:<br /> <code>git fetch https://github.com/LarisaPk/Birdnest_back.git</code></li>
+<li>Create .env file in the root of the project. Add following to the file (links to the external APIs):</li>
+</ul>
+<pre class="prettyprint source"><code>DRONES_URL = &quot;https://assignments.reaktor.com/birdnest/drones&quot;
+PILOT_URL = &quot;https://assignments.reaktor.com/birdnest/pilots/&quot;
+</code></pre>
+<ul>
+<li>run <code>npm -install</code></li>
+<li>run <code>npm run dev</code></li>
+<li>Server should be working by now on port 3001.</li>
+<li>Go to http://localhost:3001/api/drones/now it should return the JSON data about the drones</li>
+</ul>
+<h2>Usage</h2>
+<h3>For VSCode users</h3>
+<ul>
+<li>
+<p>Install REST Client extention that allows you to send HTTP request and view the response in Visual Studio Code directly.<br />
+Link: https://marketplace.visualstudio.com/items?itemName=humao.rest-client</p>
+</li>
+<li>
+<p>Go to &quot;requests&quot; directory of the project and see there available requests options to try.</p>
+</li>
+</ul>
+<h3>For other users</h3>
+<p>There are three endpoints that can be tested in the browser, for example:</p>
+<ul>
+<li>
+<p>Returns all drones seen by equipment in the last snapshot<br />
+http://localhost:3001/api/drones/now</p>
+</li>
+<li>
+<p>Returns drones in NDZ in the last snapshot<br />
+http://localhost:3001/api/drones/ndz</p>
+</li>
+<li>
+<p>Returns pilots who violated NDZ for the past 10 minutes<br />
+http://localhost:3001/api/pilots</p>
+</li>
+</ul>
+<h2>Deployed version</h2>
+<p>Deployed version can be found here : https://birdnest-backend.cyclic.app/<br /></p>
+<p>Correspondingly endpoints:</p>
+<ul>
+<li>https://birdnest-backend.cyclic.app/api/drones/now</li>
+<li>https://birdnest-backend.cyclic.app/api/drones/ndz</li>
+<li>https://birdnest-backend.cyclic.app/api/pilots</li>
+</ul>
+<p>Because backend is deployed for free, it has limitations.</p>
+<p>Frontend is built with this in mind:<br />
+&quot;Applications are only on for the time it takes to process individual requests. They are suspended immediately after each response is sent&quot;.<br /></p>
+<p>More info : https://docs.cyclic.sh/serverless/on-demand</p>
+<h2>Tests</h2>
+<p>To run tests use command <code>npm run test</code><br /></p>
+<p>Due to time limitations Author wrote tests only for some functionality.<br />
+TODO: Write more tests.</p>
+<h2>Author</h2>
+<p>Larisa Pyykölä.</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-constants.html">constants</a></li><li><a href="module-controllers_drones.html">controllers/drones</a></li><li><a href="module-controllers_pilots.html">controllers/pilots</a></li><li><a href="module-services_appData.html">services/appData</a></li><li><a href="module-services_getData.html">services/getData</a></li><li><a href="module-services_getPilots.html">services/getPilots</a></li><li><a href="module-utils_helpers.html">utils/helpers</a></li><li><a href="module-utils_middleware.html">utils/middleware</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Mon Jan 16 2023 15:04:53 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

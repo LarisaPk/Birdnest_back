@@ -1,7 +1,7 @@
 {
   "source": {
     "includePattern": ".+\\.js(doc|x)?$",
-    "include": ["."],
+    "include": [".", "README.md"],
     "exclude": ["node_modules", "tests"]
   },
   "recurseDepth": 10,
