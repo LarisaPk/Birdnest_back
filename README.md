@@ -19,7 +19,6 @@ https://larisapk.github.io/Birdnest_back/
 - [Tests](#tests)
 - [Author](#author)
 
-<a name="about">
 ## About
 
 This is the pre-assignment project for Reaktor's Developer Trainee, summer 2023 programme.
