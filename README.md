@@ -54,15 +54,15 @@ Build and deploy a web application which lists all the pilots who recently viola
 - Data about pilots in NDZ should be stored for 10 minutes from when their drone was last seen by the equipment.
 - Process the incoming GET requests, generate and send the response to the client. JSON format.
 
-GET All the drones from the past snapshot
-/api/drones/now
+- GET All the drones from the past snapshot
+  /api/drones/now
 
-GET All the drones in NDZ the past snapshot
-api/drones/ndz
-(not in use atm by the frontend though, used during development for testing)
+- GET All the drones in NDZ the past snapshot
+  api/drones/ndz
+  (not in use atm by the frontend though, used during development for testing)
 
-GET All the pilots in NDZ for the past 10 munutes
-/api/pilots
+- GET All the pilots in NDZ for the past 10 munutes
+  /api/pilots
 
 ## Getting Started
 
@@ -73,24 +73,28 @@ GET All the pilots in NDZ for the past 10 munutes
   Check that you are running the latest version of Node on your computer. Run the command node -v in your console to see which version you have running. If its less than 18 then you need to upgrade.
 
 - npm (installed together with NodeJS) to check version run npm -v
-  [Link to NodeJS installation] (https://nodejs.org/en/)
+  Link to NodeJS installation: https://nodejs.org/en/
 
 - git
   check the version run git --version
-  [Link to installation]
-  (https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+  Link to installation
+  https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 ### Installing
 
 - Create a directory where you want to download this project files and go to that directory using CLI.
 - Download data from a remote repository using command git fetch https://github.com/LarisaPk/Birdnest_back.git
 - Create .env file in the root of the project. Add following to the file (links to the external APIs):
-  DRONES_URL = "https://assignments.reaktor.com/birdnest/drones"
-  PILOT_URL = "https://assignments.reaktor.com/birdnest/pilots/"
+
+```
+DRONES_URL = "https://assignments.reaktor.com/birdnest/drones"
+PILOT_URL = "https://assignments.reaktor.com/birdnest/pilots/"
+```
+
 - run npm -install
 - run npm run dev
 - Server should be working by now on port 3001.
-  Go to <http://localhost:3001/api/drones/now> it should return the JSON data about the drones
+  Go to http://localhost:3001/api/drones/now it should return the JSON data about the drones
 
 ## Usage
 
@@ -118,15 +122,23 @@ There are three endpoints that can be tested in the browser, for example:
 
 Deployed version can be found here : <https://birdnest-backend.cyclic.app/>
 Correspondingly endpoints:
-<https://birdnest-backend.cyclic.app/api/drones/now>
-<https://birdnest-backend.cyclic.app/api/drones/ndz>
-<https://birdnest-backend.cyclic.app/api/pilots>
+
+- https://birdnest-backend.cyclic.app/api/drones/now
+- https://birdnest-backend.cyclic.app/api/drones/ndz
+- https://birdnest-backend.cyclic.app/api/pilots
 
 Because backend is deployed for free, it has limitations.
 
 Frontend is built with this in mind:
 "Applications are only on for the time it takes to process individual requests. They are suspended immediately after each response is sent".
-More info : <https://docs.cyclic.sh/serverless/on-demand>
+More info : https://docs.cyclic.sh/serverless/on-demand
+
+## Tests
+
+To run tests use command npm run test.
+
+Due to time limitations Author wrote tests only for some functionality.
+TODO: Write more tests.
 
 ## Author
 
