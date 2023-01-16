@@ -4,6 +4,10 @@
 
 Project for the Reaktor Developer Trainee, summer 2023 application. Backend.
 
+## Documentation
+
+https://larisapk.github.io/Birdnest_back/
+
 ## Table of Contents
 
 - [About](#about)
@@ -13,8 +17,9 @@ Project for the Reaktor Developer Trainee, summer 2023 application. Backend.
 - [Usage](#usage)
 - [Deployed version](#deployed)
 - [Tests](#tests)
-- [Contributing](#contributing)
+- [Author](#author)
 
+<a name="about">
 ## About
 
 This is the pre-assignment project for Reaktor's Developer Trainee, summer 2023 programme.
