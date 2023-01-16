@@ -33,7 +33,7 @@ According to the pre-assignment, there is a birdnest of a very rare bird. Territ
 Full text of the pre-assingment task can be found here: https://assignments.reaktor.com/birdnest/
 
 This is the backend of the project.
-Frontend can be found here: (https://github.com/LarisaPk/Birdnest_front)
+Frontend can be found here: https://github.com/LarisaPk/Birdnest_front
 
 ## Objectives
 
@@ -71,7 +71,7 @@ Build and deploy a web application which lists all the pilots who recently viola
 
 - "node": ">=18.0.0"
   Project uses NodeJS 18 Fetch API.
-  Check that you are running the latest version of Node on your computer. Run the command node -v in your console to see which version you have running. If its less than 18 then you need to upgrade.
+  Check that you are running the latest version of Node on your computer. Run the command `node -v` in your console to see which version you have running. If its less than 18 then you need to upgrade.
 
 - npm (installed together with NodeJS) to check version run `npm -v`<br />
   Link to NodeJS installation: https://nodejs.org/en/
@@ -84,7 +84,7 @@ Build and deploy a web application which lists all the pilots who recently viola
 ### Installing
 
 - Create a directory where you want to download this project files and go to that directory using CLI.
-- Download data from a remote repository using command `git fetch https://github.com/LarisaPk/Birdnest_back.git`
+- Download data from a remote repository using command:<br /> `git fetch https://github.com/LarisaPk/Birdnest_back.git`
 - Create .env file in the root of the project. Add following to the file (links to the external APIs):
 
 ```
@@ -122,6 +122,7 @@ There are three endpoints that can be tested in the browser, for example:
 ## Deployed version
 
 Deployed version can be found here : https://birdnest-backend.cyclic.app/<br />
+
 Correspondingly endpoints:
 
 - https://birdnest-backend.cyclic.app/api/drones/now
@@ -132,6 +133,7 @@ Because backend is deployed for free, it has limitations.
 
 Frontend is built with this in mind:<br />
 "Applications are only on for the time it takes to process individual requests. They are suspended immediately after each response is sent".<br />
+
 More info : https://docs.cyclic.sh/serverless/on-demand
 
 ## Tests
