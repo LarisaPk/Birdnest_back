@@ -87,7 +87,7 @@ Following endpoints should be available for the client:<br />
 
 ### Installation
 
-- Download data from a remote repository. (Using `git clone https://github.com/LarisaPk/Birdnest_back.git` or "Download ZIP" option in Github)<br />
+- Download data from a remote repository. (Using `git clone https://github.com/LarisaPk/Birdnest_back.git` or "Download ZIP" option in GitHub repo)<br />
   See instructions: https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository<br />
 - Create .env file in the root of the project. Add following to the file (links to the external APIs):
 
