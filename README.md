@@ -6,7 +6,7 @@ Project for the Reaktor Developer Trainee, summer 2023 application. Backend.
 
 ## Documentation
 
-Documentation done using JSDoc. (see https://jsdoc.app/)<br />
+Documentation has been done with JSDoc. (see https://jsdoc.app/)<br />
 
 Link to the documentation:<br />
 https://larisapk.github.io/Birdnest_back/
