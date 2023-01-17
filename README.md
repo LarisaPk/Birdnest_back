@@ -96,13 +96,13 @@ DRONES_URL = "https://assignments.reaktor.com/birdnest/drones"
 PILOT_URL = "https://assignments.reaktor.com/birdnest/pilots/"
 ```
 
-- Go to the project directory using CLI and run `npm install`
+- Go to the project's root directory using CLI and run `npm install`
 
 Everything should be installed now.
 
 ## Usage
 
-- In the project directory using CLI run `npm run dev`<br />
+- In the project's root directory using CLI run `npm run dev`<br />
   Server should be working by now on port 3001.
 
 - Go to http://localhost:3001/api/drones/now it should return the JSON data about the drones
