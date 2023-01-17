@@ -6,6 +6,9 @@ Project for the Reaktor Developer Trainee, summer 2023 application. Backend.
 
 ## Documentation
 
+Documentation done using JSDoc. (see https://jsdoc.app/)<br />
+
+Link to the documentation:<br />
 https://larisapk.github.io/Birdnest_back/
 
 ## Table of Contents
@@ -13,7 +16,7 @@ https://larisapk.github.io/Birdnest_back/
 - [About](#about)
 - [Objectives](#objectives)
 - [Getting Started](#getting_started)
-- [Installing](#installing)
+- [Installation](#installing)
 - [Usage](#usage)
 - [Deployed version](#deployed)
 - [Tests](#tests)
@@ -47,7 +50,7 @@ Build and deploy a web application which lists all the pilots who recently viola
 
 - Persist the pilot information for 10 minutes since their drone was last seen by the equipment
 - Display the closest confirmed distance to the nest
-- Contain the pilot name, email address and phone number
+- Contain the pilot's name, email address and phone number
 - Immediately show the information from the last 10 minutes to anyone opening the application
 - Not require the user to manually refresh the view to see up-to-date information
 
@@ -55,9 +58,11 @@ Build and deploy a web application which lists all the pilots who recently viola
 
 - Repeatedly fetch data from external API with the minimun of 2 seconds intervals.
 - Process the data and filter drones who violated No Fly Zone.
-- Fetch the pilots of the drones in NDZ data from external API.
+- Fetch the pilots info of the drones who violated NDZ from external API.
 - Data about pilots in NDZ should be stored for 10 minutes from when their drone was last seen by the equipment.
 - Process the incoming GET requests, generate and send the response to the client. JSON format.
+
+Following endpoints should be available for the client:<br />
 
 - GET All the drones from the past snapshot<br />
   ~/api/drones/now
@@ -71,24 +76,19 @@ Build and deploy a web application which lists all the pilots who recently viola
 
 ## Getting Started
 
-### Pre-requisites
+### Prerequisites
 
 - "node": ">=18.0.0"
-  Project uses NodeJS 18 Fetch API.
+  Project uses Node.js 18 Fetch API.
   Check that you are running the latest version of Node on your computer. Run the command `node -v` in your console to see which version you have running. If its less than 18 then you need to upgrade.
 
-- npm (installed together with NodeJS) to check version run `npm -v`<br />
-  Link to NodeJS installation: https://nodejs.org/en/
+- npm (installed together with Node.js) to check version run `npm -v`<br />
+  Link to Node.js installation: https://nodejs.org/en/
 
-- git
-  check the version run `git --version`<br />
-  Link to installation
-  https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+### Installation
 
-### Installing
-
-- Create a directory where you want to download this project files and go to that directory using CLI.
-- Download data from a remote repository using command:<br /> `git fetch https://github.com/LarisaPk/Birdnest_back.git`
+- Download data from a remote repository. (Using `git clone https://github.com/LarisaPk/Birdnest_back.git` of "Download ZIP" option in Github)<br />
+  See instructions: https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository<br />
 - Create .env file in the root of the project. Add following to the file (links to the external APIs):
 
 ```
@@ -96,19 +96,24 @@ DRONES_URL = "https://assignments.reaktor.com/birdnest/drones"
 PILOT_URL = "https://assignments.reaktor.com/birdnest/pilots/"
 ```
 
-- run `npm -install`
-- run `npm run dev`
-- Server should be working by now on port 3001.
-- Go to http://localhost:3001/api/drones/now it should return the JSON data about the drones
+- Go to the project directory using CLI and run `npm install`
+
+Everything should be installed now.
 
 ## Usage
+
+- In the project directory using CLI run `npm run dev`<br />
+  Server should be working by now on port 3001.
+
+- Go to http://localhost:3001/api/drones/now it should return the JSON data about the drones
 
 ### For VSCode users
 
 - Install REST Client extention that allows you to send HTTP request and view the response in Visual Studio Code directly.<br />
   Link: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
 
-- Go to "requests" directory of the project and see there available requests options to try.
+- Go to "requests" directory of the project and see there available requests options to try.<br />
+- In each file click "Send Request" at the top to see what happens.
 
 ### For other users
 
@@ -133,14 +138,17 @@ Correspondingly endpoints:
 - https://birdnest-backend.cyclic.app/api/drones/ndz
 - https://birdnest-backend.cyclic.app/api/pilots
 
-Because backend is deployed for free, it has limitations.
+Ideally our backend app should be always up and running. So it always has updated data, but because it is deployed for free, it has limitations.
 
-Frontend is built with this in mind:<br />
+Keep this in mind:<br />
 "Applications are only on for the time it takes to process individual requests. They are suspended immediately after each response is sent".<br />
+More info : https://docs.cyclic.sh/serverless/on-demand<br />
 
-More info : https://docs.cyclic.sh/serverless/on-demand
+So, basically using free deployment service like cyclic.sh means that backend will only run when client continue sending requests to it. Otherwise it will stop fetching and processing data from external API. Should be fine for testing purposes though. If not, try to test it locally then :) Just download and run frontend app too! It is easy...
 
 ## Tests
+
+Jest framework is used for testing https://jestjs.io/
 
 To run tests use command `npm run test`<br />
 

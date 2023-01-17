@@ -31,6 +31,12 @@
             Project for the Reaktor Developer Trainee, summer 2023 application.
             Backend.
           </p>
+          <h2>Documentation</h2>
+          <p>Documentation done using JSDoc. (see https://jsdoc.app/)<br /></p>
+          <p>
+            Link to the documentation:<br />
+            https://larisapk.github.io/Birdnest_back/
+          </p>
 
           <h2>About</h2>
           <p>
@@ -88,7 +94,7 @@
               last seen by the equipment
             </li>
             <li>Display the closest confirmed distance to the nest</li>
-            <li>Contain the pilot name, email address and phone number</li>
+            <li>Contain the pilot's name, email address and phone number</li>
             <li>
               Immediately show the information from the last 10 minutes to
               anyone opening the application
@@ -101,33 +107,27 @@
           <h3>Objectives of this bakend project</h3>
           <ul>
             <li>
-              <p>
-                Repeatedly fetch data from external API with the minimun of 2
-                seconds intervals.
-              </p>
+              Repeatedly fetch data from external API with the minimun of 2
+              seconds intervals.
             </li>
             <li>
-              <p>
-                Process the data and filter drones who violated No Fly Zone.
-              </p>
+              Process the data and filter drones who violated No Fly Zone.
             </li>
             <li>
-              <p>
-                Fetch the pilots of the drones in NDZ data from external API.
-              </p>
+              Fetch the pilots info of the drones who violated NDZ from external
+              API.
             </li>
             <li>
-              <p>
-                Data about pilots in NDZ should be stored for 10 minutes from
-                when their drone was last seen by the equipment.
-              </p>
+              Data about pilots in NDZ should be stored for 10 minutes from when
+              their drone was last seen by the equipment.
             </li>
             <li>
-              <p>
-                Process the incoming GET requests, generate and send the
-                response to the client. JSON format.
-              </p>
+              Process the incoming GET requests, generate and send the response
+              to the client. JSON format.
             </li>
+          </ul>
+          <p>Following endpoints should be available for the client:<br /></p>
+          <ul>
             <li>
               <p>
                 GET All the drones from the past snapshot<br />
@@ -150,43 +150,35 @@
             </li>
           </ul>
           <h2>Getting Started</h2>
-          <h3>Pre-requisites</h3>
+          <h3>Prerequisites</h3>
           <ul>
             <li>
               <p>
-                &quot;node&quot;: &quot;&gt;=18.0.0&quot; Project uses NodeJS 18
-                Fetch API. Check that you are running the latest version of Node
-                on your computer. Run the command <code>node -v</code> in your
-                console to see which version you have running. If its less than
-                18 then you need to upgrade.
+                &quot;node&quot;: &quot;&gt;=18.0.0&quot; Project uses Node.js
+                18 Fetch API. Check that you are running the latest version of
+                Node on your computer. Run the command <code>node -v</code> in
+                your console to see which version you have running. If its less
+                than 18 then you need to upgrade.
               </p>
             </li>
             <li>
               <p>
-                npm (installed together with NodeJS) to check version run
+                npm (installed together with Node.js) to check version run
                 <code>npm -v</code><br />
-                Link to NodeJS installation: https://nodejs.org/en/
-              </p>
-            </li>
-            <li>
-              <p>
-                git check the version run <code>git --version</code><br />
-                Link to installation
-                https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+                Link to Node.js installation: https://nodejs.org/en/
               </p>
             </li>
           </ul>
-          <h3>Installing</h3>
+          <h3>Installation</h3>
           <ul>
             <li>
-              Create a directory where you want to download this project files
-              and go to that directory using CLI.
-            </li>
-            <li>
-              Download data from a remote repository using command:<br />
+              Download data from a remote repository. (Using
               <code
-                >git fetch https://github.com/LarisaPk/Birdnest_back.git</code
+                >git clone https://github.com/LarisaPk/Birdnest_back.git</code
               >
+              of &quot;Download ZIP&quot; option in Github)<br />
+              See instructions:
+              https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository<br />
             </li>
             <li>
               Create .env file in the root of the project. Add following to the
@@ -199,15 +191,28 @@
 PILOT_URL = &quot;https://assignments.reaktor.com/birdnest/pilots/&quot;
 </code></pre>
           <ul>
-            <li>run <code>npm -install</code></li>
-            <li>run <code>npm run dev</code></li>
-            <li>Server should be working by now on port 3001.</li>
             <li>
-              Go to http://localhost:3001/api/drones/now it should return the
-              JSON data about the drones
+              Go to the project directory using CLI and run
+              <code>npm install</code>
             </li>
           </ul>
+          <p>Everything should be installed now.</p>
           <h2>Usage</h2>
+          <ul>
+            <li>
+              <p>
+                In the project directory using CLI run <code>npm run dev</code
+                ><br />
+                Server should be working by now on port 3001.
+              </p>
+            </li>
+            <li>
+              <p>
+                Go to http://localhost:3001/api/drones/now it should return the
+                JSON data about the drones
+              </p>
+            </li>
+          </ul>
           <h3>For VSCode users</h3>
           <ul>
             <li>
@@ -221,7 +226,13 @@ PILOT_URL = &quot;https://assignments.reaktor.com/birdnest/pilots/&quot;
             <li>
               <p>
                 Go to &quot;requests&quot; directory of the project and see
-                there available requests options to try.
+                there available requests options to try.<br />
+              </p>
+            </li>
+            <li>
+              <p>
+                In each file click &quot;Send Request&quot; at the top to see
+                what happens.
               </p>
             </li>
           </ul>
@@ -261,15 +272,28 @@ PILOT_URL = &quot;https://assignments.reaktor.com/birdnest/pilots/&quot;
             <li>https://birdnest-backend.cyclic.app/api/drones/ndz</li>
             <li>https://birdnest-backend.cyclic.app/api/pilots</li>
           </ul>
-          <p>Because backend is deployed for free, it has limitations.</p>
           <p>
-            Frontend is built with this in mind:<br />
+            Ideally our backend app should be always up and running. So it
+            always has updated data, but because it is deployed for free, it has
+            limitations.
+          </p>
+          <p>
+            Keep this in mind:<br />
             &quot;Applications are only on for the time it takes to process
             individual requests. They are suspended immediately after each
             response is sent&quot;.<br />
+            More info : https://docs.cyclic.sh/serverless/on-demand<br />
           </p>
-          <p>More info : https://docs.cyclic.sh/serverless/on-demand</p>
+          <p>
+            So, basically using free deployment service like cyclic.sh means
+            that backend will only run when client continue sending requests to
+            it. Otherwise it will stop fetching and processing data from
+            external API. Should be fine for testing purposes though. If not,
+            try to test it locally then :) Just download and run frontend app
+            too! It is easy...
+          </p>
           <h2>Tests</h2>
+          <p>Jest framework is used for testing https://jestjs.io/</p>
           <p>To run tests use command <code>npm run test</code><br /></p>
           <p>
             Due to time limitations Author wrote tests only for some
@@ -301,8 +325,8 @@ PILOT_URL = &quot;https://assignments.reaktor.com/birdnest/pilots/&quot;
 
     <footer>
       Documentation generated by
-      <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Mon Jan 16
-      2023 15:04:53 GMT+0200 (Eastern European Standard Time)
+      <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Tue Jan 17
+      2023 10:05:55 GMT+0200 (Eastern European Standard Time)
     </footer>
 
     <script>
