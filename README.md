@@ -102,7 +102,7 @@ Everything should be installed now.
 
 ## Usage
 
-- In the project's root directory using CLI run `npm run dev`<br />
+- In the project's root directory using CLI run `npm start`<br />
   Server should be working by now on port 3001.
 
 - Go to http://localhost:3001/api/drones/now it should return the JSON data about the drones
